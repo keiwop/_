@@ -1,0 +1,76 @@
+Compte-rendu		Maxime Martin
+
+
+
+Avec xmllint several-i.xml l'option --xinclude permet d'inclure le contenu des
+fichiers several-{1,2} pointés par les balises :
+	<xi:include href="several-1.xml"/>
+	<xi:include href="several-2.xml"/>
+	
+	
+Latex
+%for-lc-2>java net.sf.saxon.Transform -s:automne-0.xml -xsl:fr0-2-latex.xsl > avery.tex
+%for-lc-2>texi2pdf avery.tex
+
+Transformation fr1-count.xsl : 
+	%for-lc-2>java net.sf.saxon.Transform -s:automne-1.xml -xsl:fr1-count.xsl
+		Le nombre de strophes est : 6
+
+	%for-lc-2>diff fr0-count-plus.xsl fr1-count.xsl
+		3c3
+		< <xsl:stylesheet version="2.0" id="fr0-count-plus"
+		---
+		> <xsl:stylesheet version="2.0" id="fr1-count"
+		14c14
+		<   <xsl:template match="poemefr0" as="xsd:string">
+		---
+		>   <xsl:template match="poemefr1" as="xsd:string">
+		16c16
+		<       select="'Le nombre de strophes est : ',count(corps/strophe),$eol"
+		---
+		>       select="'Le nombre de strophes est : ',count(corps/ligne[@strophe = 'oui']),$eol"
+		
+Transformation fr1-cumulate.xsl : 
+	%for-lc-2>java net.sf.saxon.Transform -s:automne-1.xml -xsl:fr1-cumulate.xsl 
+	Les nombres de lignes cumulées sont
+	0
+	3
+	6
+	9
+	12
+	15
+
+	%for-lc-2>diff fr0-cumulate-count-plus.xsl fr1-cumulate.xsl
+		3c3
+		< <xsl:stylesheet version="2.0" id="fr0-cumulate-count-plus"
+		---
+		> <xsl:stylesheet version="2.0" id="fr1-cumulate"
+		14c14
+		<   <xsl:template match="poemefr0">
+		---
+		>   <xsl:template match="poemefr1">
+		19,21c19,20
+		<     <xsl:value-of select="'Les nombres de lignes cumul�es sont',$eol"
+		<                   separator=""/>
+		<     <xsl:apply-templates select="strophe[1]"/>
+		---
+		>     <xsl:value-of select="'Les nombres de lignes cumul�es sont',$eol" separator=""/>
+		>     <xsl:apply-templates select="ligne[@strophe='oui']"/>
+		24c23
+		<   <xsl:template match="strophe">
+		---
+		>   <xsl:template match="ligne[@strophe='oui']">
+		26,27c25
+		<     <xsl:variable name="newly-counted" select="$already-counted + count(ligne)"
+		<                   as="xsd:integer"/>
+		---
+		>     <xsl:variable name="newly-counted" select="$already-counted + count(ligne[@strophe!='oui'])" as="xsd:integer"/>
+		29,31c27,28
+		<     <xsl:apply-templates select="following-sibling::strophe[1]">
+		<       <xsl:with-param name="already-counted" select="$newly-counted"
+		<                       as="xsd:integer"/>
+		---
+		>     <xsl:apply-templates select="following-sibling::ligne[@strophe='oui'][0]">
+		>       <xsl:with-param name="already-counted" select="$newly-counted" as="xsd:integer"/>
+		35a33
+		> 
