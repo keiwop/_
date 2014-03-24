@@ -1,0 +1,6 @@
+#!/usr/bin/zsh
+cd /boot
+mv vmlinuz-linux-arch vmlinuz-linux-arch.bkp
+mv vmlinuz-linux vmlinuz-linux-arch
+mv initramfs-linux-arch.img initramfs-linux-arch.img.bkp
+mv initramfs-linux.img initramfs-linux-arch.img
