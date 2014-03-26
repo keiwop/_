@@ -1,0 +1,193 @@
+
+#alias keiwop='echo \'Maxime Martin\''
+#licenses=(GPLv3+ WTFPLv2+)
+
+
+
+
+################################################################################
+#----------------------------------------------------------Prompt--------------#
+################################################################################
+autoload -Uz compinit promptinit
+
+compinit
+promptinit
+prompt walters
+
+autoload -U colors && colors
+
+PS1="%{$fg[green]%}%B%#%b%{$fg[blue]%}%B%T%b%{$fg[cyan]%}%B%.%b%{$fg[magenta]%}%B>%b%{$reset_color%}%"
+
+
+
+
+################################################################################
+#----------------------------------------------------------Path----------------#
+################################################################################
+typeset -U path
+
+_0="/home/_"
+
+cdpath=($_0)
+
+path=($path $_0/bin/racket-5.93/bin $_0/bin $_0/scripts $_0/c)
+ld_library_path=($ld_library_path $_0/bin/racket-5.93/lib $_0/lib)
+#CLASSPATH=($CLASSPATH /usr/share/java/saxon/saxon9.jar)
+
+
+
+
+################################################################################
+#----------------------------------------------------------Aliases-------------#
+################################################################################
+alias -g '...'='../..'
+alias -g '....'='../../..'
+
+alias -g C='| wc -l'
+alias -g G='| grep'
+alias -g H='| head'
+alias -g L='| less'
+alias -g LL='|& less -r'
+alias -g S='| sort'
+alias -g SL='| sort | less'
+alias -g T='| tail'
+
+alias -g ll='ls -lhpF --color=auto'
+alias -g lll='ll -CR'
+alias -g la='ll -a'
+
+alias -g cd_='cd /home/_'
+alias -g cdf='cd /home/_/work/fac'
+alias -g cd.='cd ..'
+alias -g cd..='cd ...'
+alias -g cd...='cd ....'
+
+alias -g ck='mkdir_cd'
+
+alias -g top10='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
+
+#alias -g prog_32u4='avrdude -v -v -v -v -D -P/dev/ACM0 -cavr109 -b57600 -patmega32u4 -Uflash:w:$firmware:i'
+
+
+
+
+################################################################################
+#----------------------------------------------------------Functions-----------#
+################################################################################
+machine_suspend(){
+	systemctl suspend
+	echo '\tGoing to sleep'
+	echo '\tBye'
+	sleep 2
+}
+
+machine_hibernate(){
+	echo '\n\tWinter is coming...'
+	sleep 1
+	echo '\t...Going into hibernation mode'
+	sleep 2
+	echo '\nIt was a joke, the hard drive has crashed.'
+	echo 'Now your computer is going to explode in'
+	sleep 3
+	for ((i = 3; i > 0; i--)); do
+		echo '\t'$i;
+		sleep 1
+	done;
+	systemctl hibernate
+}
+
+machine_poweroff(){
+	systemctl poweroff
+	sleep 1
+	echo '\n\tPowering off in'
+	sleep 1
+	for ((i = 3; i > 0; i--)); do
+		echo '\t'$i;
+		sleep 1
+	done;
+}
+
+
+
+
+################################################################################
+#----------------------------------------------------------Completion----------#
+################################################################################
+setopt completealiases
+unsetopt LIST_AMBIGUOUS
+setopt  COMPLETE_IN_WORD
+
+[ -r /etc/profile.d/cnf.sh ] && . /etc/profile.d/cnf.sh
+
+zstyle ':completion:*' completer _expand_alias _complete _approximate _ignored _expand _correct
+zstyle ':completion:*' list-colors ''
+zstyle ':prompt:grml:left:setup' items rc virtual-env change-root user at host path vcs percent
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' expand prefix suffix
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' insert-unambiguous true
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' list-colors "=(#b) #([0-9]#)*=36=31"
+zstyle ':completion:*:manuals' separate-sections true
+zstyle ':completion:*' list-separator 'fREW'
+zstyle ':completion:*:approximate:*' max-errors 'reply=(  $((  ($#PREFIX+$#SUFFIX)/3  ))  )'
+zstyle ':completion:*' ignore-parents parent pwd
+
+zstyle :compinstall filename '/home/keiwop/.zshrc'
+
+
+
+
+################################################################################
+#----------------------------------------------------------Misc----------------#
+################################################################################
+#	U+	Ctrl + Shift + U
+#	‾	U+203E
+#	¯	U+00AF
+
+WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>' # the default
+WORDCHARS=.
+WORDCHARS='*?_[]~=&;!#$%^(){}'
+WORDCHARS='${WORDCHARS:s@/@}'
+
+setopt histallowclobber
+setopt nocheckjobs
+setopt printexitvalue
+setopt interactivecomments
+
+export MANWIDTH=${MANWIDTH:-80}
+
+
+stty erase "^?"
+
+# 10 second wait after a rm * (Best thing ever !)
+setopt RM_STAR_WAIT
+
+# use magic (this is default, but it can't hurt!)
+setopt ZLE
+setopt NO_HUP
+#setopt VI
+
+# If I could disable Ctrl-s completely I would!
+setopt NO_FLOW_CONTROL
+
+# Case insensitive globbing
+setopt NO_CASE_GLOB
+
+# Be Reasonable!
+setopt NUMERIC_GLOB_SORT
+
+# I don't know why I never set this before.
+setopt EXTENDED_GLOB
+
+# hows about arrays be awesome?  (that is, frew${cool}frew has frew surrounding all the variables, not just first and last
+setopt RC_EXPAND_PARAM
+
+
